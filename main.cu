@@ -40,7 +40,8 @@ struct argp_option options[] =
   {
     { "blocks-per-gpu", 'b', "LEN", 0,
       "Specify the number of blocks per GPU (defaults to either the the number of elements each GPU needs to process divided by the threads per block or the GPU's maxGridSize[0])" },
-    { "vector-length", 'N', "LEN", 0, "Specify the vector lengths" },
+    { "vector-length", 'N', "LEN", 0, 
+      "Specify the vector lengths (defaults to 2^28)" },
     { "threads-per-block", 't', "LEN", 0,
       "Specify the number of threads per GPU block (defaults to maxThreadsPerBlock of GPU)" },
     { "verbose", 'v', 0, 0, "Explains what is being done" },
