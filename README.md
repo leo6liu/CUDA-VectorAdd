@@ -13,7 +13,7 @@ solution by calculating the total error.
 	                              either the the number of elements each GPU needs
 				      to process divided by the threads per block or the
 				      GPU's maxGridSize[0])
-	   -N, --vector-length=LEN    Specify the vector lengths
+	   -N, --vector-length=LEN    Specify the vector lengths (defaults to 2^28)
 	   -t, --threads-per-block=LEN   Specify the number of threads per GPU block
                                          (defaults to maxThreadsPerBlock of GPU)
 	   -v, --verbose              Explains what is being done
