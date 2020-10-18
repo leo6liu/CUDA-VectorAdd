@@ -39,7 +39,7 @@ GPUs to perform vector addition";
 struct argp_option options[] =
   {
     { "threads-per-block", 't', "DIM", 0,
-      "Specify the number of threads per GPU block (defaults to 512)" },
+      "Specify the number of threads per GPU block (defaults to maxThreadsPerBlock of GPU)" },
     { "verbose", 'v', 0, 0, "Explains what is being done" },
     { 0 }
   };
