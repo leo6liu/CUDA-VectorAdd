@@ -84,7 +84,8 @@ vec_add_cpu (float *a, float *b, float *c, int len)
 // function: vec_add_gpu
 //
 void
-vec_add_gpu (float *h_a, float *h_b, float *h_c, int len, int n_gpus)
+vec_add_gpu (float *h_a, float *h_b, float *h_c, int len, int n_gpus,
+	     int threads)
 {
   // declare variables and cuda events for timer
   //
@@ -123,14 +124,29 @@ vec_add_gpu (float *h_a, float *h_b, float *h_c, int len, int n_gpus)
       printf("STATUS: Expect undefined behavior...\n");
     }
 
-    // calculate number of threads per block and number of blocks
+    // calculate number of threads per block
     //
-    int threads = prop.maxThreadsPerBlock;
+    if (threads == -1) { // default
+      threads = prop.maxThreadsPerBlock;
+    } else if (threads > prop.maxThreadsPerBlock) {
+      threads = prop.maxThreadsPerBlock;
+      printf("INFO: Requested threads exceeds maxThreadsPerBlock. %s%d\n",
+	     "Defaulting to maxThreadsPerBlock: ", threads);
+    }
+
+    // calculate number of blocks
+    //
     int blocks;
     if (ceil((double)gpu_len / (double)threads) > prop.maxGridSize[0]) {
       blocks = prop.maxGridSize[0];
     } else {
       blocks = (int)ceil((float)gpu_len / threads);
+    }
+
+    // print threads and blocks for GPU 0
+    //
+    if (cpu_thread_id == 0) {
+      printf("INFO: ThreadsPerBlock: %d, BlocksPerGPU: %d\n", threads, blocks);    
     }
     
 #pragma omp barrier // sync threads before starting in_time timer

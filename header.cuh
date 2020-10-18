@@ -9,6 +9,7 @@
 
 // include files
 //
+#include <argp.h>
 #include <stdio.h>
 #include <omp.h>
 
@@ -22,7 +23,8 @@ void vec_rand_init(float *vector, int len);
 void vec_print(FILE *fs, float *vector, int len);
 float vec_error(float *vec_1, float *vec_2, int len);
 void vec_add_cpu(float *a, float *b, float *c, int len);
-void vec_add_gpu(float *a, float *b, float *c, int len, int n_gpus);
+void vec_add_gpu(float *a, float *b, float *c, int len, int n_gpus,
+		 int threads);
 
 // kernel definitions
 //
