@@ -15,7 +15,7 @@
 
 // define constants
 //
-#define VECTOR_LENGTH (1 << 28) // 1^28 * sizeof(float) = 1 GiB
+#define VECTOR_LENGTH (1 << 28) // 2^28 * sizeof(float) = 1 GiB
  
 // function definitions
 //
