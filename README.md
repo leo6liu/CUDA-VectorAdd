@@ -5,7 +5,7 @@ generates two float vectors of length 2^28 with values[0,1], adds them using
 the available CUDA compute-capable devices, and compares the result with a CPU
 solution by calculating the total error.
 
-	nedc_000_[1]: ./add --help
+	$ ./add --help
 	Usage: add [OPTION...]
 	CUDA VectorAdd -- a program which scales across multiple GPUs to perform vector
 	addition
