@@ -11,7 +11,7 @@ solution by calculating the total error.
 	addition
 
 	  -t, --threads-per-block=DIM   Specify the number of threads per GPU block
-	                                (defaults to 512)
+	                                (defaults to maxThreadsPerBlock of GPU)
 	  -v, --verbose              Explains what is being done
 	  -?, --help                 Give this help list
 	      --usage                Give a short usage message
