@@ -38,7 +38,10 @@ GPUs to perform vector addition";
 //
 struct argp_option options[] =
   {
-    { "threads-per-block", 't', "DIM", 0,
+    { "blocks-per-gpu", 'b', "LEN", 0,
+      "Specify the number of blocks per GPU (defaults to either the the number of elements each GPU needs to process divided by the threads per block or the GPU's maxGridSize[0])" },
+    { "vector-length", 'N', "LEN", 0, "Specify the vector lengths" },
+    { "threads-per-block", 't', "LEN", 0,
       "Specify the number of threads per GPU block (defaults to maxThreadsPerBlock of GPU)" },
     { "verbose", 'v', 0, 0, "Explains what is being done" },
     { 0 }
@@ -48,6 +51,8 @@ struct argp_option options[] =
 //
 struct arguments
 {
+  int blocks;
+  int N;
   int threads;
   int verbose;
 };
@@ -59,7 +64,13 @@ parse_opt (int key, char *arg, struct argp_state *state)
 {
   struct arguments *arguments = (struct arguments *)state->input;
   switch (key) {
-  case 't': // --threads-per-block=NUM
+  case 'b': // --blocks-per-gpu=LEN
+    arguments->blocks = atoi(arg);
+    break;
+  case 'N': // --vector-length=LEN
+    arguments->N = atoi(arg);
+    break;
+  case 't': // --threads-per-block=LEN
     arguments->threads = atoi(arg);
     break;
   case 'v': // --verbose
@@ -84,7 +95,9 @@ main (int argc, char **argv)
   // set default argument values
   //
   struct arguments args;
-  args.threads = -1;
+  args.blocks = -1; // determine blocks based on GPU properties
+  args.N = VECTOR_LENGTH;
+  args.threads = -1; // determine threads based on GPU properties
   args.verbose = 0;
 
   // parse for arguments and options
@@ -106,17 +119,17 @@ main (int argc, char **argv)
 
   // print length and type of vectors
   //
-  if (n_gpus == 0) {
+  if (args.verbose == 1) {
     printf("INFO: This program adds two float vectors (A + B = C) of length %d.\n",
-	   VECTOR_LENGTH);
+	   args.N);
   }
   
   // declare and allocate host vectors for a + b = c
   //
-  float *a = (float *)malloc(VECTOR_LENGTH * sizeof(float));
-  float *b = (float *)malloc(VECTOR_LENGTH * sizeof(float));
-  float *c_cpu = (float *)malloc(VECTOR_LENGTH * sizeof(float));
-  float *c_gpu = (float *)malloc(VECTOR_LENGTH * sizeof(float));
+  float *a = (float *)malloc(args.N * sizeof(float));
+  float *b = (float *)malloc(args.N * sizeof(float));
+  float *c_cpu = (float *)malloc(args.N * sizeof(float));
+  float *c_gpu = (float *)malloc(args.N * sizeof(float));
   
   // use current time as seed for random generator
   //
@@ -127,11 +140,11 @@ main (int argc, char **argv)
   if (args.verbose == 1) {
     printf("STATUS: Initializing values for vector A...\n");
   }
-  vec_rand_init(a, VECTOR_LENGTH);
+  vec_rand_init(a, args.N);
   if (args.verbose == 1) {
     printf("STATUS: Initializing values for vector B...\n");
   }
-  vec_rand_init(b, VECTOR_LENGTH);
+  vec_rand_init(b, args.N);
   
   // print first five values of a and b
   //
@@ -149,14 +162,14 @@ main (int argc, char **argv)
   if (args.verbose == 1) {
     printf("STATUS: Calculating entrywise sum on GPU...\n");
   }
-  vec_add_gpu(a, b, c_gpu, VECTOR_LENGTH, n_gpus, args.threads);
+  vec_add_gpu(a, b, c_gpu, args.N, n_gpus, args.threads, args.blocks);
   
   // calcuate entrywise sum on CPU
   //
   if (args.verbose == 1) {
     printf("STATUS: Calculating entrywise sum on CPU...\n");
   }
-  vec_add_cpu(a, b, c_cpu, VECTOR_LENGTH);
+  vec_add_cpu(a, b, c_cpu, args.N);
   
   // print first five values of c_gpu
   //
@@ -179,7 +192,7 @@ main (int argc, char **argv)
   if (args.verbose == 1) {
     printf("STATUS: Calculating total error between CPU and GPU results...\n");
   }
-  float error = vec_error(c_cpu, c_gpu, VECTOR_LENGTH);
+  float error = vec_error(c_cpu, c_gpu, args.N);
   printf("INFO: Total error: %f\n", error);
 
   // deallocate host vectors

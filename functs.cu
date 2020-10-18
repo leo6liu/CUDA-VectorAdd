@@ -85,7 +85,7 @@ vec_add_cpu (float *a, float *b, float *c, int len)
 //
 void
 vec_add_gpu (float *h_a, float *h_b, float *h_c, int len, int n_gpus,
-	     int threads)
+	     int threads, int blocks)
 {
   // declare variables and cuda events for timer
   //
@@ -136,11 +136,16 @@ vec_add_gpu (float *h_a, float *h_b, float *h_c, int len, int n_gpus,
 
     // calculate number of blocks
     //
-    int blocks;
-    if (ceil((double)gpu_len / (double)threads) > prop.maxGridSize[0]) {
+    if (blocks == -1) {
+      if (ceil((double)gpu_len / (double)threads) > prop.maxGridSize[0]) {
+	blocks = prop.maxGridSize[0];
+      } else {
+	blocks = (int)ceil((float)gpu_len / threads);
+      }
+    } else if (blocks > prop.maxGridSize[0]) {
       blocks = prop.maxGridSize[0];
-    } else {
-      blocks = (int)ceil((float)gpu_len / threads);
+      printf("INFO: Requested threads exceeds maxGridSize. %s%d\n",
+	     "Defaulting to maxGridSize[0]: ", blocks);
     }
 
     // print threads and blocks for GPU 0

@@ -24,7 +24,7 @@ void vec_print(FILE *fs, float *vector, int len);
 float vec_error(float *vec_1, float *vec_2, int len);
 void vec_add_cpu(float *a, float *b, float *c, int len);
 void vec_add_gpu(float *a, float *b, float *c, int len, int n_gpus,
-		 int threads);
+		 int threads, int blocks);
 
 // kernel definitions
 //
