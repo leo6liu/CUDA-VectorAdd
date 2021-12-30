@@ -17,6 +17,8 @@
 //
 #include "header.cuh"
 
+// I want a comment here.
+
 //=============================================================================
 //
 // setup argument parser
